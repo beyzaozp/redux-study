@@ -1,25 +1,50 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { connect } from "react-redux";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 
-function App() {
+import Counter from "./components/Counter";
+import CounterActions from "./components/CounterActions";
+import Header from "./components/header";
+import Footer from "./components/footer";
+
+import { routes } from "./routes";
+
+const mapStateProps = (state) => ({
+  dark:state.site.dark,
+  user: state.auth.user
+})
+
+function App({dark, user}) {
+
+
+  console.log(routes);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className={dark ? "dark" : "light"}>
+        <Header />
+        <Routes>
+          {routes.map((route) => (
+            <Route
+              path={route.path}
+              element={
+                route.auth && !user ? (
+                  <Navigate to="/login" />
+                ) : (
+                  <route.component />
+                )
+              }
+            />
+          ))}
+        </Routes>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 
-export default App;
+export default connect(mapStateProps)(App);
